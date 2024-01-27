@@ -1,16 +1,19 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const app = express();
-dotenv?.config();
+const mongoose = require("mongoose");
 
+dotenv?.config();
 const PORT = process.env.PORT;
+const MONGO_DB_URL = process.env.MONGO_DB_URL;
+mongoose.connect(MONGO_DB_URL);
+
+// Middleware to parse body
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("Hello Finflix!");
 });
-
-// Middleware to parse body
-app.use(express.json());
 
 // Global catch, Server errors
 app.use((err, req, res, next) => {
