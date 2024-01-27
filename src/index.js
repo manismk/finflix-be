@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const app = express();
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
+const userAuthenticateMiddleware = require("./middleware/userAuthenticateMiddleware");
 
 dotenv?.config();
 const PORT = process.env.PORT;
@@ -12,12 +13,14 @@ mongoose.connect(MONGO_DB_URL);
 // Middleware to parse body
 app.use(express.json());
 
+// Authentication
+app.use("/auth", authRoutes);
+
+// Authenticated Routes
+app.use(userAuthenticateMiddleware);
 app.get("/", (req, res) => {
   res.send("Hello Finflix!");
 });
-
-// Authentication
-app.use("/auth", authRoutes);
 
 // Global catch, Server errors
 app.use((err, req, res, next) => {
