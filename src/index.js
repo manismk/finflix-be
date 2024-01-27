@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const app = express();
 const mongoose = require("mongoose");
+const authRoutes = require("./routes/authRoutes");
 
 dotenv?.config();
 const PORT = process.env.PORT;
@@ -14,6 +15,9 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Hello Finflix!");
 });
+
+// Authentication
+app.use("/auth", authRoutes);
 
 // Global catch, Server errors
 app.use((err, req, res, next) => {
