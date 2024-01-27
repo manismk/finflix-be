@@ -6,6 +6,8 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
+
+// Input Validation
 const passwordSchema = zod
   .string()
   .min(8)
@@ -15,14 +17,12 @@ const passwordSchema = zod
   .regex(/[0-9]/, {
     message: "Password must contain at least one number",
   });
-
 const signUpUserSchema = zod.object({
   first_name: zod.string().min(1),
   last_name: zod.string().min(1),
   username: zod.string().email(),
   password: passwordSchema,
 });
-
 const signUpAdminSchema = zod.object({
   first_name: zod.string().min(1),
   last_name: zod.string().min(1),
@@ -30,7 +30,6 @@ const signUpAdminSchema = zod.object({
   password: passwordSchema,
   admin_key: zod.literal(process.env.ADMIN_KEY),
 });
-
 const loginSchema = zod.object({
   username: zod.string().email(),
   password: zod.string(),
@@ -98,7 +97,7 @@ const signUpAdmin = async (req, res) => {
   }
 };
 
-// User Login
+// User/Admin Login
 const loginUser = async (req, res) => {
   try {
     const zodResponse = loginSchema.safeParse(req.body);
