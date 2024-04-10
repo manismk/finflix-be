@@ -16,10 +16,10 @@ mongoose.connect(MONGO_DB_URL);
 // Middleware to parse body
 app.use(express.json());
 
-// Authentication
+// UnauthenticatedRoutes
 app.use("/auth", authRoutes);
 
-// Authenticated Routes
+// User Authenticated Routes
 app.use(userAuthenticateMiddleware);
 app.get("/", (req, res) => {
   res.send("Hello Finflix!");
