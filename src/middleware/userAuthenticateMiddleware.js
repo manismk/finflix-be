@@ -19,7 +19,6 @@ const userAuthenticateMiddleware = (req, res, next) => {
     console.error(error);
     return res.status(401).json({ message: "Unauthorized - Invalid token" });
   }
-  next();
 };
 
 module.exports = userAuthenticateMiddleware;

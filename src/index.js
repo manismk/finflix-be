@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 const userAuthenticateMiddleware = require("./middleware/userAuthenticateMiddleware");
+const userAdminAuthMiddleware = require("./middleware/userAdminAuthMiddleware");
 
 dotenv?.config();
 const PORT = process.env.PORT;
@@ -19,6 +20,12 @@ app.use("/auth", authRoutes);
 // Authenticated Routes
 app.use(userAuthenticateMiddleware);
 app.get("/", (req, res) => {
+  res.send("Hello Finflix!");
+});
+
+// Admin Routes
+app.use(userAdminAuthMiddleware);
+app.get("/admin-check", (req, res) => {
   res.send("Hello Finflix!");
 });
 
