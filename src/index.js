@@ -4,6 +4,11 @@ const app = express();
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 const userAuthenticateMiddleware = require("./middleware/userAuthenticateMiddleware");
+const userAdminAuthMiddleware = require("./middleware/userAdminAuthMiddleware");
+const categoryRoutes = require("./routes/categoryRoutes");
+const creatorRoutes = require("./routes/creatorRoutes");
+const videoUnAuthRoutes = require("./routes/VideoUnAuthRoutes");
+const videoAdminRoutes = require("./routes/videoAdminRoutes");
 
 dotenv?.config();
 const PORT = process.env.PORT;
@@ -13,14 +18,21 @@ mongoose.connect(MONGO_DB_URL);
 // Middleware to parse body
 app.use(express.json());
 
-// Authentication
+// Unauthenticated Routes
 app.use("/auth", authRoutes);
+app.use("/video", videoUnAuthRoutes);
 
-// Authenticated Routes
+// User Authenticated Routes
 app.use(userAuthenticateMiddleware);
 app.get("/", (req, res) => {
   res.send("Hello Finflix!");
 });
+
+// Admin Routes
+app.use(userAdminAuthMiddleware);
+app.use("/category", categoryRoutes);
+app.use("/creator", creatorRoutes);
+app.use("/video", videoAdminRoutes);
 
 // Global catch, Server errors
 app.use((err, req, res, next) => {
