@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 const userAuthenticateMiddleware = require("./middleware/userAuthenticateMiddleware");
 const userAdminAuthMiddleware = require("./middleware/userAdminAuthMiddleware");
+const categoryRoutes = require("./routes/categoryRoutes");
 
 dotenv?.config();
 const PORT = process.env.PORT;
@@ -25,9 +26,7 @@ app.get("/", (req, res) => {
 
 // Admin Routes
 app.use(userAdminAuthMiddleware);
-app.get("/admin-check", (req, res) => {
-  res.send("Hello Finflix!");
-});
+app.use("/category", categoryRoutes);
 
 // Global catch, Server errors
 app.use((err, req, res, next) => {
