@@ -6,6 +6,7 @@ const authRoutes = require("./routes/authRoutes");
 const userAuthenticateMiddleware = require("./middleware/userAuthenticateMiddleware");
 const userAdminAuthMiddleware = require("./middleware/userAdminAuthMiddleware");
 const categoryRoutes = require("./routes/categoryRoutes");
+const creatorRoutes = require("./routes/creatorRoutes");
 
 dotenv?.config();
 const PORT = process.env.PORT;
@@ -27,6 +28,7 @@ app.get("/", (req, res) => {
 // Admin Routes
 app.use(userAdminAuthMiddleware);
 app.use("/category", categoryRoutes);
+app.use("/creator", creatorRoutes);
 
 // Global catch, Server errors
 app.use((err, req, res, next) => {
