@@ -16,7 +16,7 @@ mongoose.connect(MONGO_DB_URL);
 // Middleware to parse body
 app.use(express.json());
 
-// UnauthenticatedRoutes
+// Unauthenticated Routes
 app.use("/auth", authRoutes);
 
 // User Authenticated Routes
