@@ -61,7 +61,8 @@ const updateCategory = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: "Invalid category ID" });
     }
-    const { name } = req.body;
+    const zodResponse = createCategorySchema.safeParse(req.body);
+    const { name } = zodResponse.data;
     const updatedCategory = await Category.findByIdAndUpdate(
       req.params.id,
       { name },
@@ -72,8 +73,10 @@ const updateCategory = async (req, res) => {
     }
     res.json(updatedCategory);
   } catch (error) {
-    console.log("error", error);
-    res.status(500).json({ error: "Server error" });
+    console.error(error);
+    res
+      .status(411)
+      .json({ message: "Invalid user data", errors: error.errors });
   }
 };
 
