@@ -7,6 +7,8 @@ const userAuthenticateMiddleware = require("./middleware/userAuthenticateMiddlew
 const userAdminAuthMiddleware = require("./middleware/userAdminAuthMiddleware");
 const categoryRoutes = require("./routes/categoryRoutes");
 const creatorRoutes = require("./routes/creatorRoutes");
+const videoUnAuthRoutes = require("./routes/VideoUnAuthRoutes");
+const videoAdminRoutes = require("./routes/videoAdminRoutes");
 
 dotenv?.config();
 const PORT = process.env.PORT;
@@ -18,6 +20,7 @@ app.use(express.json());
 
 // Unauthenticated Routes
 app.use("/auth", authRoutes);
+app.use("/video", videoUnAuthRoutes);
 
 // User Authenticated Routes
 app.use(userAuthenticateMiddleware);
@@ -29,6 +32,7 @@ app.get("/", (req, res) => {
 app.use(userAdminAuthMiddleware);
 app.use("/category", categoryRoutes);
 app.use("/creator", creatorRoutes);
+app.use("/video", videoAdminRoutes);
 
 // Global catch, Server errors
 app.use((err, req, res, next) => {
