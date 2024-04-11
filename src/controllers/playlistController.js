@@ -122,10 +122,49 @@ const addVideoToPlaylist = async (req, res) => {
   }
 };
 
+const removeVideoFromPlaylist = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const playlistId = req.params.playlistId;
+    const videoId = req.params.videoId;
+
+    if (
+      !mongoose.Types.ObjectId.isValid(userId) ||
+      !mongoose.Types.ObjectId.isValid(playlistId)
+    ) {
+      return res.status(411).json({ message: "Invalid user input" });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(404).json({ message: "Video not found" });
+    }
+    const playlist = await Playlist.findById(playlistId);
+    if (!playlist) {
+      return res.status(404).json({ message: "Playlist not found" });
+    }
+    const playlistIndex = playlist.videos.indexOf(videoId);
+    if (playlistIndex === -1) {
+      return res.json({ message: "Video is not present in playlist" });
+    } else {
+      playlist.videos.splice(playlistIndex, 1);
+      await playlist.save();
+      return res.json({ message: "Video removed from playlist successfully" });
+    }
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 const playlistController = {
   createPlaylist,
   getAllPlaylists,
   addVideoToPlaylist,
+  removeVideoFromPlaylist,
 };
 
 module.exports = playlistController;

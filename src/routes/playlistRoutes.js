@@ -8,6 +8,10 @@ router.post(
   "/playlist/:playlistId/:videoId",
   playlistController.addVideoToPlaylist
 );
+router.delete(
+  "/playlist/:playlistId/:videoId",
+  playlistController.removeVideoFromPlaylist
+);
 
 const playlistRoutes = router;
 
