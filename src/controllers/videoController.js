@@ -3,6 +3,7 @@ const zod = require("zod");
 const Video = require("../models/Video");
 const Creator = require("../models/Creator");
 const Category = require("../models/category");
+const User = require("../models/User");
 
 // Input Validation
 const createVideoSchema = zod.object({
@@ -65,6 +66,19 @@ const createVideo = async (req, res) => {
 const getAllVideos = async (req, res) => {
   try {
     const videos = await Video.find().populate("creator").populate("category");
+    // For getting like count
+    const users = await User.find();
+    const likeCountMap = {};
+    users.forEach((user) => {
+      user.likedVideos.forEach((videoId) => {
+        if (likeCountMap[videoId]) {
+          likeCountMap[videoId]++;
+        } else {
+          likeCountMap[videoId] = 1;
+        }
+      });
+    });
+
     const formattedVideos = videos.map((video) => ({
       _id: video._id,
       title: video.title,
@@ -73,6 +87,7 @@ const getAllVideos = async (req, res) => {
       description: video.description,
       duration: video.duration,
       category: video.category.name,
+      likeCount: likeCountMap[video._id] || 0,
     }));
     res.status(200).json(formattedVideos);
   } catch (error) {
