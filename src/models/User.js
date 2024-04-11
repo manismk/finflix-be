@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   is_admin: { type: Boolean, required: true },
   likedVideos: [{ type: String, ref: "Video" }],
+  watchLater: [{ type: String, ref: "Video" }],
 });
 
 // Hash the password before saving to the database
