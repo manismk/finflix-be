@@ -85,6 +85,49 @@ const getAllPlaylists = async (req, res) => {
   }
 };
 
+const getPlaylistById = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const playlistId = req.params.playlistId;
+
+    if (
+      !mongoose.Types.ObjectId.isValid(userId) ||
+      !mongoose.Types.ObjectId.isValid(playlistId)
+    ) {
+      return res.status(411).json({ message: "Invalid user input" });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const playlist = await Playlist.findById(playlistId).populate({
+      path: "videos",
+      model: "Video", // optional
+      populate: [{ path: "creator" }, { path: "category" }],
+    });
+    if (!playlist) {
+      return res.status(404).json({ message: "Playlist not found" });
+    }
+    const formatterPlaylist = {
+      _id: playlist._id,
+      name: playlist.name,
+      videos: playlist.videos.map((video) => ({
+        _id: video._id,
+        title: video.title,
+        creator: video.creator.name,
+        creatorImgUrl: video.creator.img_url,
+        description: video.description,
+        duration: video.duration,
+        category: video.category.name,
+      })),
+    };
+    res.json(formatterPlaylist);
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 const addVideoToPlaylist = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -165,6 +208,7 @@ const playlistController = {
   getAllPlaylists,
   addVideoToPlaylist,
   removeVideoFromPlaylist,
+  getPlaylistById,
 };
 
 module.exports = playlistController;
