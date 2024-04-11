@@ -28,8 +28,12 @@ const createPlaylist = async (req, res) => {
     }
     const { name } = zodResponse.data;
 
-    const newPlaylist = new Playlist({ name, user: userId });
-    await newPlaylist.save();
+    const newPlaylist = await Playlist.create({ name, user: userId });
+    await User.findByIdAndUpdate(
+      userId,
+      { $push: { playlists: newPlaylist._id } },
+      { new: true }
+    );
     return res.status(200).json({ message: "Playlist created successfully" });
   } catch (error) {
     console.log("error", error);
@@ -37,6 +41,25 @@ const createPlaylist = async (req, res) => {
   }
 };
 
-const playlistController = { createPlaylist };
+const getAllPlaylists = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(411).json({ message: "Invalid user input" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.json(user.playlists);
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+const playlistController = { createPlaylist, getAllPlaylists };
 
 module.exports = playlistController;
