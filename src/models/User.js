@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   is_admin: { type: Boolean, required: true },
+  likedVideos: [{ type: String, ref: "Video" }],
 });
 
 // Hash the password before saving to the database
@@ -22,4 +23,6 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;
