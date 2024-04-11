@@ -9,6 +9,7 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const creatorRoutes = require("./routes/creatorRoutes");
 const videoUnAuthRoutes = require("./routes/VideoUnAuthRoutes");
 const videoAdminRoutes = require("./routes/videoAdminRoutes");
+const likeRoutes = require("./routes/likeRoutes");
 
 dotenv?.config();
 const PORT = process.env.PORT;
@@ -24,6 +25,7 @@ app.use("/video", videoUnAuthRoutes);
 
 // User Authenticated Routes
 app.use(userAuthenticateMiddleware);
+app.use("/user", likeRoutes);
 app.get("/", (req, res) => {
   res.send("Hello Finflix!");
 });
