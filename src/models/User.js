@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   likedVideos: [{ type: String, ref: "Video" }],
   watchLater: [{ type: String, ref: "Video" }],
   history: [{ type: String, ref: "Video" }],
+  playlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Playlist" }],
 });
 
 // Hash the password before saving to the database
