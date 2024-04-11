@@ -32,9 +32,6 @@ app.use("/user", likeRoutes);
 app.use("/user", watchLaterRoutes);
 app.use("/user", historyRoutes);
 app.use("/user", playlistRoutes);
-app.get("/", (req, res) => {
-  res.send("Hello Finflix!");
-});
 
 // Admin Routes
 app.use(userAdminAuthMiddleware);
