@@ -4,6 +4,7 @@ const Video = require("../models/Video");
 const Creator = require("../models/Creator");
 const Category = require("../models/Category");
 const User = require("../models/User");
+const { getVideoInFormat } = require("../utils/getVideoInFormat");
 
 // Input Validation
 const createVideoSchema = zod.object({
@@ -79,16 +80,7 @@ const getAllVideos = async (req, res) => {
       });
     });
 
-    const formattedVideos = videos.map((video) => ({
-      _id: video._id,
-      title: video.title,
-      creator: video.creator.name,
-      creatorImgUrl: video.creator.img_url,
-      description: video.description,
-      duration: video.duration,
-      category: video.category.name,
-      likeCount: likeCountMap[video._id] || 0,
-    }));
+    const formattedVideos = getVideoInFormat({ videos });
     res.status(200).json(formattedVideos);
   } catch (error) {
     console.log("error", error);

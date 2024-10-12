@@ -3,6 +3,7 @@ const zod = require("zod");
 const User = require("../models/User");
 const Playlist = require("../models/Playlist");
 const Video = require("../models/Video");
+const { getVideoInFormat } = require("../utils/getVideoInFormat");
 
 const createPlaylistSchema = zod.object({
   name: zod.string().min(1),
@@ -47,15 +48,7 @@ const createPlaylist = async (req, res) => {
     const formatterPlaylists = playlists.map((playlist) => ({
       _id: playlist._id,
       name: playlist.name,
-      videos: playlist.videos.map((video) => ({
-        _id: video._id,
-        title: video.title,
-        creator: video.creator.name,
-        creatorImgUrl: video.creator.img_url,
-        description: video.description,
-        duration: video.duration,
-        category: video.category.name,
-      })),
+      videos: getVideoInFormat({ videos: playlist.videos }),
     }));
 
     return res.status(201).json({
@@ -93,15 +86,7 @@ const getAllPlaylists = async (req, res) => {
     const formatterPlaylists = playlists.map((playlist) => ({
       _id: playlist._id,
       name: playlist.name,
-      videos: playlist.videos.map((video) => ({
-        _id: video._id,
-        title: video.title,
-        creator: video.creator.name,
-        creatorImgUrl: video.creator.img_url,
-        description: video.description,
-        duration: video.duration,
-        category: video.category.name,
-      })),
+      videos: getVideoInFormat({ videos: playlist.videos }),
     }));
 
     return res.json(formatterPlaylists);
@@ -137,15 +122,7 @@ const getPlaylistById = async (req, res) => {
     const formatterPlaylist = {
       _id: playlist._id,
       name: playlist.name,
-      videos: playlist.videos.map((video) => ({
-        _id: video._id,
-        title: video.title,
-        creator: video.creator.name,
-        creatorImgUrl: video.creator.img_url,
-        description: video.description,
-        duration: video.duration,
-        category: video.category.name,
-      })),
+      videos: getVideoInFormat({ videos: playlist.videos }),
     };
     res.json(formatterPlaylist);
   } catch (error) {
@@ -191,15 +168,7 @@ const removePlaylistById = async (req, res) => {
       const formatterPlaylists = playlists.map((playlist) => ({
         _id: playlist._id,
         name: playlist.name,
-        videos: playlist.videos.map((video) => ({
-          _id: video._id,
-          title: video.title,
-          creator: video.creator.name,
-          creatorImgUrl: video.creator.img_url,
-          description: video.description,
-          duration: video.duration,
-          category: video.category.name,
-        })),
+        videos: getVideoInFormat({ videos: playlist.videos }),
       }));
       return res.json({
         message: "Playlist deleted successfully",
@@ -259,15 +228,7 @@ const addVideoToPlaylist = async (req, res) => {
       const formatterPlaylists = playlists.map((playlist) => ({
         _id: playlist._id,
         name: playlist.name,
-        videos: playlist.videos.map((video) => ({
-          _id: video._id,
-          title: video.title,
-          creator: video.creator.name,
-          creatorImgUrl: video.creator.img_url,
-          description: video.description,
-          duration: video.duration,
-          category: video.category.name,
-        })),
+        videos: getVideoInFormat({ videos: playlist.videos }),
       }));
 
       return res.status(201).json({
@@ -324,15 +285,7 @@ const removeVideoFromPlaylist = async (req, res) => {
       const formatterPlaylists = playlists.map((playlist) => ({
         _id: playlist._id,
         name: playlist.name,
-        videos: playlist.videos.map((video) => ({
-          _id: video._id,
-          title: video.title,
-          creator: video.creator.name,
-          creatorImgUrl: video.creator.img_url,
-          description: video.description,
-          duration: video.duration,
-          category: video.category.name,
-        })),
+        videos: getVideoInFormat({ videos: playlist.videos }),
       }));
 
       return res.json({

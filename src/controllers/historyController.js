@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const Video = require("../models/Video");
+const { getVideoInFormat } = require("../utils/getVideoInFormat");
 
 const addToHistory = async (req, res) => {
   try {
@@ -38,15 +39,7 @@ const addToHistory = async (req, res) => {
     const sortedVideos = videoIds.map((videoId) =>
       videos.find((video) => String(video._id) === String(videoId))
     );
-    const formattedVideos = sortedVideos.map((video) => ({
-      _id: video._id,
-      title: video.title,
-      creator: video.creator.name,
-      creatorImgUrl: video.creator.img_url,
-      description: video.description,
-      duration: video.duration,
-      category: video.category.name,
-    }));
+    const formattedVideos = getVideoInFormat({ videos: sortedVideos });
     return res.status(201).json({
       message: "Video added to history successfully",
       history: formattedVideos,
@@ -89,15 +82,7 @@ const removeFromHistory = async (req, res) => {
       const sortedVideos = videoIds.map((videoId) =>
         videos.find((video) => String(video._id) === String(videoId))
       );
-      const formattedVideos = sortedVideos.map((video) => ({
-        _id: video._id,
-        title: video.title,
-        creator: video.creator.name,
-        creatorImgUrl: video.creator.img_url,
-        description: video.description,
-        duration: video.duration,
-        category: video.category.name,
-      }));
+      const formattedVideos = getVideoInFormat({ videos: sortedVideos });
       res.json({
         message: "Video removed from history",
         history: formattedVideos,
@@ -132,15 +117,7 @@ const getAllHistory = async (req, res) => {
     const sortedVideos = videoIds.map((videoId) =>
       videos.find((video) => String(video._id) === String(videoId))
     );
-    const formattedVideos = sortedVideos.map((video) => ({
-      _id: video._id,
-      title: video.title,
-      creator: video.creator.name,
-      creatorImgUrl: video.creator.img_url,
-      description: video.description,
-      duration: video.duration,
-      category: video.category.name,
-    }));
+    const formattedVideos = getVideoInFormat({ videos: sortedVideos });
 
     res.status(200).json(formattedVideos);
   } catch (error) {

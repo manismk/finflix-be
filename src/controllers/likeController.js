@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const Video = require("../models/Video");
+const { getVideoInFormat } = require("../utils/getVideoInFormat");
 
 const likeVideo = async (req, res) => {
   try {
@@ -29,15 +30,7 @@ const likeVideo = async (req, res) => {
       const videos = await Video.find({ _id: { $in: videoIds } })
         .populate("category")
         .populate("creator");
-      const formattedVideos = videos.map((video) => ({
-        _id: video._id,
-        title: video.title,
-        creator: video.creator.name,
-        creatorImgUrl: video.creator.img_url,
-        description: video.description,
-        duration: video.duration,
-        category: video.category.name,
-      }));
+      const formattedVideos = getVideoInFormat({ videos });
       res.status(201).json({
         message: "Video liked successfully",
         likes: formattedVideos,
@@ -79,15 +72,7 @@ const disLikeVideo = async (req, res) => {
       const videos = await Video.find({ _id: { $in: videoIds } })
         .populate("category")
         .populate("creator");
-      const formattedVideos = videos.map((video) => ({
-        _id: video._id,
-        title: video.title,
-        creator: video.creator.name,
-        creatorImgUrl: video.creator.img_url,
-        description: video.description,
-        duration: video.duration,
-        category: video.category.name,
-      }));
+      const formattedVideos = getVideoInFormat({ videos });
       res.json({
         message: "Video disliked successfully",
         likes: formattedVideos,
@@ -118,15 +103,7 @@ const getAllLikedVideos = async (req, res) => {
     const videos = await Video.find({ _id: { $in: videoIds } })
       .populate("category")
       .populate("creator");
-    const formattedVideos = videos.map((video) => ({
-      _id: video._id,
-      title: video.title,
-      creator: video.creator.name,
-      creatorImgUrl: video.creator.img_url,
-      description: video.description,
-      duration: video.duration,
-      category: video.category.name,
-    }));
+    const formattedVideos = getVideoInFormat({ videos });
 
     res.status(200).json(formattedVideos);
   } catch (error) {
