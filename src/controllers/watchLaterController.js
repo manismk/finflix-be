@@ -24,9 +24,24 @@ const addToWatchLaterVideo = async (req, res) => {
     if (!user?.watchLater?.includes(video_id)) {
       user?.watchLater?.push(video_id);
       await user.save();
-      res
-        .status(200)
-        .json({ message: "Video added to watch later successfully" });
+      const videoIds = user.watchLater;
+
+      const videos = await Video.find({ _id: { $in: videoIds } })
+        .populate("category")
+        .populate("creator");
+      const formattedVideos = videos.map((video) => ({
+        _id: video._id,
+        title: video.title,
+        creator: video.creator.name,
+        creatorImgUrl: video.creator.img_url,
+        description: video.description,
+        duration: video.duration,
+        category: video.category.name,
+      }));
+      res.status(201).json({
+        message: "Video added to watch later successfully",
+        watchlater: formattedVideos,
+      });
     } else {
       return res.status(400).json({ error: "Video already in watch later" });
     }
@@ -59,7 +74,24 @@ const removeFromWatchLater = async (req, res) => {
     if (index !== -1) {
       user.watchLater.splice(index, 1);
       await user.save();
-      res.json({ message: "Video removed from Watch later" });
+      const videoIds = user.watchLater;
+
+      const videos = await Video.find({ _id: { $in: videoIds } })
+        .populate("category")
+        .populate("creator");
+      const formattedVideos = videos.map((video) => ({
+        _id: video._id,
+        title: video.title,
+        creator: video.creator.name,
+        creatorImgUrl: video.creator.img_url,
+        description: video.description,
+        duration: video.duration,
+        category: video.category.name,
+      }));
+      res.json({
+        message: "Video removed from Watch later",
+        watchlater: formattedVideos,
+      });
     } else {
       return res.status(400).json({ error: "Video is not in watch later" });
     }

@@ -56,8 +56,18 @@ const signUpUser = async (req, res) => {
       is_admin: false,
     });
     await newUser.save();
+    const user = await User.findOne({ username });
+    const token = jwt.sign(
+      { userId: user._id, username: user.username },
+      JWT_SECRET,
+      {
+        expiresIn: "720h",
+      }
+    );
 
-    res.status(201).json({ message: "User registered successfully" });
+    res
+      .status(201)
+      .json({ message: "User registered successfully", token, user });
   } catch (error) {
     console.error(error);
     res
@@ -116,7 +126,7 @@ const loginUser = async (req, res) => {
         }
       );
 
-      res.json({ message: "Login successful", token });
+      res.json({ message: "Login successful", token, user });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
     }

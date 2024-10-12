@@ -30,12 +30,38 @@ const createPlaylist = async (req, res) => {
     const { name } = zodResponse.data;
 
     const newPlaylist = await Playlist.create({ name, user: userId });
-    await User.findByIdAndUpdate(
+    const userRes = await User.findByIdAndUpdate(
       userId,
       { $push: { playlists: newPlaylist._id } },
       { new: true }
-    );
-    return res.status(200).json({ message: "Playlist created successfully" });
+    ).populate({
+      path: "playlists",
+      populate: {
+        path: "videos",
+        model: "Video", // optional
+        populate: [{ path: "creator" }, { path: "category" }],
+      },
+    });
+    const playlists = userRes.playlists;
+
+    const formatterPlaylists = playlists.map((playlist) => ({
+      _id: playlist._id,
+      name: playlist.name,
+      videos: playlist.videos.map((video) => ({
+        _id: video._id,
+        title: video.title,
+        creator: video.creator.name,
+        creatorImgUrl: video.creator.img_url,
+        description: video.description,
+        duration: video.duration,
+        category: video.category.name,
+      })),
+    }));
+
+    return res.status(201).json({
+      message: "Playlist created successfully",
+      playlists: formatterPlaylists,
+    });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ error: "Server error" });
@@ -139,7 +165,15 @@ const removePlaylistById = async (req, res) => {
     ) {
       return res.status(411).json({ message: "Invalid user input" });
     }
-    const user = await User.findById(userId);
+    const userRes = await User.findById(userId);
+    const user = await User.findById(userId).populate({
+      path: "playlists",
+      populate: {
+        path: "videos",
+        model: "Video", // optional
+        populate: [{ path: "creator" }, { path: "category" }],
+      },
+    });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -147,12 +181,30 @@ const removePlaylistById = async (req, res) => {
     if (!playlist) {
       return res.status(404).json({ message: "Playlist not found" });
     }
-    const playlistIndex = user.playlists.indexOf(playlist._id);
+    const playlistIndex = userRes.playlists.indexOf(playlist._id);
     if (playlistIndex !== -1) {
       user.playlists.splice(playlistIndex, 1);
       user.save();
       await Playlist.findByIdAndDelete(playlistId);
-      return res.json({ message: "Playlist deleted successfully" });
+      const playlists = user.playlists;
+
+      const formatterPlaylists = playlists.map((playlist) => ({
+        _id: playlist._id,
+        name: playlist.name,
+        videos: playlist.videos.map((video) => ({
+          _id: video._id,
+          title: video.title,
+          creator: video.creator.name,
+          creatorImgUrl: video.creator.img_url,
+          description: video.description,
+          duration: video.duration,
+          category: video.category.name,
+        })),
+      }));
+      return res.json({
+        message: "Playlist deleted successfully",
+        playlists: formatterPlaylists,
+      });
     } else {
       return res
         .status(400)
@@ -177,6 +229,7 @@ const addVideoToPlaylist = async (req, res) => {
       return res.status(411).json({ message: "Invalid user input" });
     }
     const user = await User.findById(userId);
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -193,7 +246,34 @@ const addVideoToPlaylist = async (req, res) => {
     } else {
       playlist.videos.push(videoId);
       await playlist.save();
-      return res.json({ message: "Video added to playlist successfully" });
+      const userRes = await User.findById(userId).populate({
+        path: "playlists",
+        populate: {
+          path: "videos",
+          model: "Video", // optional
+          populate: [{ path: "creator" }, { path: "category" }],
+        },
+      });
+      const playlists = userRes.playlists;
+
+      const formatterPlaylists = playlists.map((playlist) => ({
+        _id: playlist._id,
+        name: playlist.name,
+        videos: playlist.videos.map((video) => ({
+          _id: video._id,
+          title: video.title,
+          creator: video.creator.name,
+          creatorImgUrl: video.creator.img_url,
+          description: video.description,
+          duration: video.duration,
+          category: video.category.name,
+        })),
+      }));
+
+      return res.status(201).json({
+        message: "Video added to playlist successfully",
+        playlists: formatterPlaylists,
+      });
     }
   } catch (error) {
     console.log("error", error);
@@ -231,7 +311,34 @@ const removeVideoFromPlaylist = async (req, res) => {
     } else {
       playlist.videos.splice(videoIndex, 1);
       await playlist.save();
-      return res.json({ message: "Video removed from playlist successfully" });
+      const userRes = await User.findById(userId).populate({
+        path: "playlists",
+        populate: {
+          path: "videos",
+          model: "Video", // optional
+          populate: [{ path: "creator" }, { path: "category" }],
+        },
+      });
+      const playlists = userRes.playlists;
+
+      const formatterPlaylists = playlists.map((playlist) => ({
+        _id: playlist._id,
+        name: playlist.name,
+        videos: playlist.videos.map((video) => ({
+          _id: video._id,
+          title: video.title,
+          creator: video.creator.name,
+          creatorImgUrl: video.creator.img_url,
+          description: video.description,
+          duration: video.duration,
+          category: video.category.name,
+        })),
+      }));
+
+      return res.json({
+        message: "Video removed from playlist successfully",
+        playlists: formatterPlaylists,
+      });
     }
   } catch (error) {
     console.log("error", error);

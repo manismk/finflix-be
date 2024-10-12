@@ -24,7 +24,24 @@ const likeVideo = async (req, res) => {
     if (!user?.likedVideos?.includes(video_id)) {
       user?.likedVideos?.push(video_id);
       await user.save();
-      res.status(200).json({ message: "Video liked successfully" });
+      const videoIds = user.likedVideos;
+
+      const videos = await Video.find({ _id: { $in: videoIds } })
+        .populate("category")
+        .populate("creator");
+      const formattedVideos = videos.map((video) => ({
+        _id: video._id,
+        title: video.title,
+        creator: video.creator.name,
+        creatorImgUrl: video.creator.img_url,
+        description: video.description,
+        duration: video.duration,
+        category: video.category.name,
+      }));
+      res.status(201).json({
+        message: "Video liked successfully",
+        likes: formattedVideos,
+      });
     } else {
       return res.status(400).json({ error: "Video already liked by the user" });
     }
@@ -57,7 +74,24 @@ const disLikeVideo = async (req, res) => {
     if (index !== -1) {
       user.likedVideos.splice(index, 1);
       await user.save();
-      res.json({ message: "Video disliked successfully" });
+      const videoIds = user.likedVideos;
+
+      const videos = await Video.find({ _id: { $in: videoIds } })
+        .populate("category")
+        .populate("creator");
+      const formattedVideos = videos.map((video) => ({
+        _id: video._id,
+        title: video.title,
+        creator: video.creator.name,
+        creatorImgUrl: video.creator.img_url,
+        description: video.description,
+        duration: video.duration,
+        category: video.category.name,
+      }));
+      res.json({
+        message: "Video disliked successfully",
+        likes: formattedVideos,
+      });
     } else {
       return res.status(400).json({ error: "User didn't like the video" });
     }

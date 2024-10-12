@@ -29,9 +29,28 @@ const addToHistory = async (req, res) => {
       user.history.unshift(video_id);
     }
     await user.save();
-    return res
-      .status(200)
-      .json({ message: "Video added to history successfully" });
+    const videoIds = user.history;
+
+    const videos = await Video.find({ _id: { $in: videoIds } })
+      .populate("category")
+      .populate("creator");
+
+    const sortedVideos = videoIds.map((videoId) =>
+      videos.find((video) => String(video._id) === String(videoId))
+    );
+    const formattedVideos = sortedVideos.map((video) => ({
+      _id: video._id,
+      title: video.title,
+      creator: video.creator.name,
+      creatorImgUrl: video.creator.img_url,
+      description: video.description,
+      duration: video.duration,
+      category: video.category.name,
+    }));
+    return res.status(201).json({
+      message: "Video added to history successfully",
+      history: formattedVideos,
+    });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ error: "Server error" });
@@ -61,7 +80,28 @@ const removeFromHistory = async (req, res) => {
     if (index !== -1) {
       user.history.splice(index, 1);
       await user.save();
-      res.json({ message: "Video removed from history" });
+      const videoIds = user.history;
+
+      const videos = await Video.find({ _id: { $in: videoIds } })
+        .populate("category")
+        .populate("creator");
+
+      const sortedVideos = videoIds.map((videoId) =>
+        videos.find((video) => String(video._id) === String(videoId))
+      );
+      const formattedVideos = sortedVideos.map((video) => ({
+        _id: video._id,
+        title: video.title,
+        creator: video.creator.name,
+        creatorImgUrl: video.creator.img_url,
+        description: video.description,
+        duration: video.duration,
+        category: video.category.name,
+      }));
+      res.json({
+        message: "Video removed from history",
+        history: formattedVideos,
+      });
     } else {
       return res.status(400).json({ error: "Video is not in history" });
     }
@@ -123,7 +163,7 @@ const clearHistory = async (req, res) => {
     }
     user.history = [];
     user.save();
-    res.status(200).json({ message: "History cleared" });
+    res.status(200).json({ message: "History cleared", history: [] });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ error: "Server error" });
