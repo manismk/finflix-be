@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const zod = require("zod");
 const Video = require("../models/Video");
 const Creator = require("../models/Creator");
-const Category = require("../models/category");
+const Category = require("../models/Category");
 const User = require("../models/User");
 
 // Input Validation
